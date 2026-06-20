@@ -6,12 +6,26 @@ import { logger } from "./lib/logger";
 
 const app: Express = express();
 
-// CORS configuration for production
+// CORS configuration - restrict to Vercel frontend only
+const ALLOWED_ORIGIN = process.env.CORS_ORIGIN || "https://wbaatz-notes.vercel.app";
+
 const corsOptions = {
-  origin: process.env.NODE_ENV === "production" 
-    ? "https://wbaatz-notes.vercel.app"
-    : "*",
+  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+    // Allow requests with no origin (like mobile apps or curl requests) in development
+    if (!origin && process.env.NODE_ENV !== "production") {
+      return callback(null, true);
+    }
+    
+    if (origin === ALLOWED_ORIGIN) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  optionsSuccessStatus: 200,
 };
 
 app.use(
@@ -34,6 +48,17 @@ app.use(
   }),
 );
 app.use(cors(corsOptions));
+
+// Security headers middleware
+app.use((req, res, next) => {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "DENY");
+  res.setHeader("X-XSS-Protection", "1; mode=block");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.setHeader("Permissions-Policy", "geolocation=(), microphone=(), camera=()");
+  next();
+});
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
