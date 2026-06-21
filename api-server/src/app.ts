@@ -7,7 +7,11 @@ import { logger } from "./lib/logger";
 const app: Express = express();
 
 // CORS configuration - restrict to Vercel frontend only
-const ALLOWED_ORIGIN = (process.env.CORS_ORIGIN || "https://wbaatz-notes.vercel.app").trim().replace(/\/$/, "");
+const rawAllowedOrigin = process.env.CORS_ORIGIN || "https://wbaatz-notes.vercel.app";
+const ALLOWED_ORIGINS = rawAllowedOrigin
+  .split(",")
+  .map((o) => o.trim().replace(/^["']|["']$/g, "").replace(/\/$/, ""))
+  .filter(Boolean);
 
 const corsOptions = {
   origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
@@ -18,10 +22,16 @@ const corsOptions = {
     
     const normalizedOrigin = origin.trim().replace(/\/$/, "");
 
-    if (normalizedOrigin === ALLOWED_ORIGIN) {
+    // Check if normalizedOrigin matches any in the ALLOWED_ORIGINS list
+    const isAllowed = ALLOWED_ORIGINS.some((allowed) => normalizedOrigin === allowed);
+
+    // Also allow any .vercel.app subdomain for easier deployment
+    const isVercel = normalizedOrigin.endsWith(".vercel.app") || normalizedOrigin.includes(".vercel.app");
+
+    if (isAllowed || isVercel) {
       callback(null, true);
     } else {
-      logger.info({ origin, allowedOrigin: ALLOWED_ORIGIN }, "CORS mismatch");
+      logger.info({ origin, allowedOrigins: ALLOWED_ORIGINS }, "CORS mismatch");
       callback(null, false);
     }
   },
