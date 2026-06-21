@@ -7,7 +7,7 @@ import { logger } from "./lib/logger";
 const app: Express = express();
 
 // CORS configuration - restrict to Vercel frontend only
-const ALLOWED_ORIGIN = process.env.CORS_ORIGIN || "https://wbaatz-notes.vercel.app";
+const ALLOWED_ORIGIN = (process.env.CORS_ORIGIN || "https://wbaatz-notes.vercel.app").trim().replace(/\/$/, "");
 
 const corsOptions = {
   origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
@@ -16,10 +16,13 @@ const corsOptions = {
       return callback(null, true);
     }
     
-    if (origin === ALLOWED_ORIGIN) {
+    const normalizedOrigin = origin.trim().replace(/\/$/, "");
+
+    if (normalizedOrigin === ALLOWED_ORIGIN) {
       callback(null, true);
     } else {
-      callback(new Error("Not allowed by CORS"));
+      logger.info({ origin, allowedOrigin: ALLOWED_ORIGIN }, "CORS mismatch");
+      callback(null, false);
     }
   },
   credentials: true,
@@ -68,6 +71,17 @@ app.get("/", (_req, res) => {
 });
 
 app.use("/api", router);
+
+// Error handling middleware
+app.use((err: any, req: any, res: any, next: any) => {
+  logger.error({ err, url: req.url, method: req.method }, "Unhandled error");
+
+  const statusCode = err.status || err.statusCode || 500;
+  res.status(statusCode).json({
+    error: "Internal Server Error",
+    message: process.env.NODE_ENV === "production" ? "An unexpected error occurred" : err.message,
+  });
+});
 
 export default app;
 
