@@ -3,3 +3,9 @@ packages:
   - 'lib/*'
 
 minimumReleaseAge: 0
+
+allowBuilds:
+  '@firebase/util': true
+  '@google/genai': true
+  esbuild: true
+  protobufjs: true
