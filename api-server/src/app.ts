@@ -6,6 +6,9 @@ import { logger } from "./lib/logger";
 
 const app: Express = express();
 
+// Trust proxy to ensure req.protocol is 'https' when behind Render's load balancer
+app.enable("trust proxy");
+
 // CORS configuration - restrict to Vercel frontend only
 const rawAllowedOrigin = process.env.CORS_ORIGIN || "https://wbaatz-notes.vercel.app";
 const ALLOWED_ORIGINS = rawAllowedOrigin
