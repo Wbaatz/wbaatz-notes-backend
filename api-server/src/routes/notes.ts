@@ -77,7 +77,8 @@ router.get("/notes/:id", async (req, res) => {
         const pdfKey = (note.pdfKey || note.pdfPath) as string;
         const cleanKey = pdfKey.replace(/^\/objects\//, "").replace(/^\//, "");
         if (cleanKey) {
-          const protocol = req.protocol || "http";
+          const isProd = process.env.NODE_ENV === "production";
+          const protocol = isProd ? "https" : (req.protocol || "http");
           const host = req.get("host") || "localhost:3000";
           pdfUrl = `${protocol}://${host}/api/storage/objects/${cleanKey}`;
         }
