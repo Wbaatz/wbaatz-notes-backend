@@ -11,8 +11,8 @@ const ALLOWED_ORIGIN = process.env.CORS_ORIGIN || "https://wbaatz-notes.vercel.a
 
 const corsOptions = {
   origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-    // Allow requests with no origin (like mobile apps or curl requests) in development
-    if (!origin && process.env.NODE_ENV !== "production") {
+    // Allow requests with no origin (like mobile apps, curl, or direct server-to-server requests)
+    if (!origin) {
       return callback(null, true);
     }
     
@@ -62,6 +62,12 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Root health check endpoint for Render / uptime monitoring
+app.get("/", (_req, res) => {
+  res.status(200).json({ status: "healthy" });
+});
+
 app.use("/api", router);
 
 export default app;
+
