@@ -1,0 +1,19 @@
+{
+  "name": "@workspace/root",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build": "pnpm -r build",
+    "dev": "pnpm -r dev",
+    "typecheck": "pnpm -r typecheck"
+  },
+  "pnpm": {
+    "overrides": {
+      "drizzle-orm": "^0.30.0",
+      "zod": "^3.22.0",
+      "@types/node": "^20.0.0",
+      "@types/react": "^18.2.0",
+      "@tanstack/react-query": "^5.0.0"
+    }
+  }
+}
