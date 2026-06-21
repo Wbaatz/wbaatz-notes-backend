@@ -3,5 +3,5 @@ services:
     name: wbaatz-notes-backend
     env: node
     plan: free
-    buildCommand: npm install -g pnpm && pnpm install && pnpm -r build
+    buildCommand: npm install -g pnpm@latest && pnpm install --frozen-lockfile && pnpm --filter api-server build
     startCommand: cd api-server && pnpm start
