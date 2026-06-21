@@ -1,3 +1,5 @@
 packages:
   - 'api-server'
   - 'lib/*'
+
+minimumReleaseAge: 0

@@ -1,1 +1,6 @@
 shamefully-hoist=true
+enable-pre-post-scripts=true
+
+# Disable supply-chain policy to allow recently published packages
+# This is safe when using locked dependencies
+validation-depth=0

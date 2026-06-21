@@ -1,5 +1,5 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "../tsconfig.base.json",
   "compilerOptions": {
     "incremental": true,
     "tsBuildInfoFile": ".tsbuildinfo",
@@ -10,10 +10,10 @@
   "include": ["src"],
   "references": [
     {
-      "path": "../../lib/api-zod"
+      "path": "../lib/api-zod"
     },
     {
-      "path": "../../lib/integrations-gemini-ai"
+      "path": "../lib/integrations-gemini-ai"
     }
   ]
 }
